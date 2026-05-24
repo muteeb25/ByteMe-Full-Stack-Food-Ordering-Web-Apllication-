@@ -1,0 +1,50 @@
+﻿@model Order?
+@{
+    ViewData["Title"] = "Track Order";
+    var order = Model;
+    var steps = new[] { "Placed", "Preparing", "Ready", "Delivered" };
+    int currentStep = order != null ? Array.IndexOf(steps, order.Status) : -1;
+    if (currentStep < 0 && order != null && order.Status == "Delivered") currentStep = 3;
+}
+
+<div class="container section track-page">
+    <h1 class="section-title">Track Your Order</h1>
+
+    @if (order == null)
+    {
+        <div class="empty-state">
+            <p>@(ViewBag.Message ?? "No order to track.")</p>
+            <a asp-controller="Menu" asp-action="Index" class="btn btn-primary">Order Now</a>
+        </div>
+    }
+    else
+    {
+        <div class="track-card" id="track-card" data-order-id="@order.Id">
+            <p class="track-order-id">Order <strong>#@order.Id</strong></p>
+            <p class="track-status-label">Status: <span id="track-status-text">@order.Status</span></p>
+
+            <div class="progress-tracker" id="progress-tracker">
+                @for (int i = 0; i < steps.Length; i++)
+                {
+                    var active = i <= currentStep;
+                    <div class="progress-step @(active ? "active" : "")" data-step="@steps[i]">
+                        <div class="step-dot"></div>
+                        <span>@steps[i]</span>
+                    </div>
+                    @if (i < steps.Length - 1) { <div class="progress-line @(i < currentStep ? "active" : "")"></div> }
+                }
+            </div>
+
+            <p class="track-address"><strong>Delivery:</strong> @order.DeliveryAddress</p>
+            <p class="track-total"><strong>Total:</strong> Rs. @order.TotalAmount.ToString("N0")</p>
+            <p class="track-refresh-note">Auto-refreshes every 30 seconds</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+@if (order != null)
+{
+<script src="~/js/track.js" asp-append-version="true"></script>
+}
+}

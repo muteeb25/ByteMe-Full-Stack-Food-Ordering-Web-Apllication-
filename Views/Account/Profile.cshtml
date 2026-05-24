@@ -1,0 +1,64 @@
+﻿@model ProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container section profile-page">
+    <h1 class="section-title">My Profile</h1>
+
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+
+    <div class="profile-grid">
+        <div class="profile-card auth-card">
+            <div class="profile-avatar-large">@(Model.User.Name.Length > 0 ? Model.User.Name[0].ToString().ToUpper() : "U")</div>
+            <h2>@Model.User.Name</h2>
+            <p class="text-muted">@Model.User.Email</p>
+            <p><strong>Member since:</strong> @Model.User.CreatedAt.ToString("MMMM yyyy")</p>
+
+            <form asp-action="UpdateProfile" method="post" class="profile-edit-form">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label for="name">Display Name</label>
+                    <input type="text" id="name" name="name" value="@Model.User.Name" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Save Name</button>
+            </form>
+        </div>
+
+        <div class="profile-stats">
+            <div class="profile-stat-box">
+                <span class="stat-num">@Model.TotalOrders</span>
+                <span class="stat-lbl">Total Orders</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="stat-num">Rs. @Model.TotalSpent.ToString("N0")</span>
+                <span class="stat-lbl">Total Spent</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="stat-num">@Model.FavoriteCategory</span>
+                <span class="stat-lbl">Favorite Category</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-orders auth-card">
+        <h3>Recent Orders</h3>
+        @if (!Model.RecentOrders.Any())
+        {
+            <p class="text-muted">No orders yet.</p>
+        }
+        else
+        {
+            <ul class="profile-order-list">
+                @foreach (var o in Model.RecentOrders)
+                {
+                    <li>
+                        <span>#@o.Id &mdash;” Rs. @o.TotalAmount.ToString("N0")</span>
+                        <span class="badge status-@o.Status.ToLower()">@o.Status</span>
+                        <a asp-controller="Order" asp-action="Track" asp-route-orderId="@o.Id">Track</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>

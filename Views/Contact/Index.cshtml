@@ -1,0 +1,37 @@
+﻿@model ContactMessage
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div class="container section">
+    <div class="auth-card contact-card">
+        <h1>Contact Us</h1>
+        <p class="auth-subtitle">We would love to hear from you</p>
+
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-success">@ViewBag.Success</div>
+        }
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-error">@ViewBag.Error</div>
+        }
+
+        <form asp-action="Submit" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label asp-for="Name">Name</label>
+                <input asp-for="Name" required />
+            </div>
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" required />
+            </div>
+            <div class="form-group">
+                <label asp-for="Message">Message</label>
+                <textarea asp-for="Message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "Orders";
+    Layout = "_AdminLayout";
+    var currentStatus = ViewBag.CurrentStatus as string ?? "All";
+    var statuses = new[] { "All", "Placed", "Preparing", "Ready", "Delivered" };
+}
+
+<div class="page-header">
+    <div>
+        <h1>Orders</h1>
+        <p class="page-subtitle">Manage and track all customer orders</p>
+    </div>
+</div>
+
+<div class="filter-tabs">
+    @foreach (var s in statuses)
+    {
+        <a asp-action="Orders" asp-route-status="@(s == "All" ? null : s)" class="filter-tab @(currentStatus == s ? "active" : "")">@s</a>
+    }
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="lumina-table orders-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Address</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr class="order-row" data-order-id="@order.Id">
+                        <td><button type="button" class="btn-expand" data-expand="@order.Id">&#9660;</button></td>
+                        <td><strong>#@order.Id</strong></td>
+                        <td>@order.User?.Name</td>
+                        <td>@order.OrderItems.Count</td>
+                        <td>Rs. @order.TotalAmount.ToString("N0")</td>
+                        <td>@order.PaymentMethod</td>
+                        <td class="cell-address">@(order.DeliveryAddress.Length > 30 ? order.DeliveryAddress[..30] + "..." : order.DeliveryAddress)</td>
+                        <td>@order.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                        <td>
+                            <select class="status-select" data-order-id="@order.Id">
+                                @foreach (var st in new[] { "Placed", "Preparing", "Ready", "Delivered" })
+                                {
+                                    if (order.Status == st)
+                                    {
+                                        <option value="@st" selected="selected">@st</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@st">@st</option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="order-detail-row" id="detail-@order.Id" hidden>
+                        <td colspan="9">
+                            <div class="order-detail">
+                                <strong>Order Items:</strong>
+                                <ul>
+                                    @foreach (var oi in order.OrderItems)
+                                    {
+                                        <li>@oi.FoodItem?.Name x @oi.Quantity — Rs. @((oi.UnitPrice * oi.Quantity).ToString("N0"))</li>
+                                    }
+                                </ul>
+                                <p><strong>Full Address:</strong> @order.DeliveryAddress</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/admin-orders.js" asp-append-version="true"></script>
+}

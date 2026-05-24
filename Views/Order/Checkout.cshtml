@@ -1,0 +1,107 @@
+﻿@model IEnumerable<CartItem>
+@{
+    ViewData["Title"] = "Checkout";
+    var subtotal = (decimal)ViewBag.Subtotal;
+    var delivery = (decimal)ViewBag.DeliveryFee;
+    var total = (decimal)ViewBag.Total;
+}
+
+<div class="container checkout-layout-wrap">
+    <h1 class="section-title">Checkout</h1>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-error">@TempData["Error"]</div>
+    }
+
+    <div class="checkout-layout">
+        <form asp-action="PlaceOrder" method="post" class="checkout-form">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label for="address">Delivery Address</label>
+                <textarea id="address" name="address" rows="4" required placeholder="Street, area, city..."></textarea>
+            </div>
+            <fieldset class="payment-methods">
+                <legend>Payment Method</legend>
+                <label class="radio-label"><input type="radio" name="paymentMethod" value="Cash on Delivery" checked /> Cash on Delivery</label>
+                <label class="radio-label"><input type="radio" name="paymentMethod" value="Credit Card" /> Credit Card</label>
+            </fieldset>
+
+            <div id="card-details" style="display:none; margin-top:16px; 
+                 padding:20px; background:#1e1e1e; border-radius:12px; 
+                 border:1px solid #333;">
+              <h4 style="color:white; margin-bottom:16px;">Card Details</h4>
+              <div style="margin-bottom:12px;">
+                <label style="color:#999; font-size:13px;">Card Number</label>
+                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456"
+                       maxlength="19"
+                       style="width:100%; padding:12px; background:#2a2a2a;
+                              border:1px solid #333; border-radius:8px;
+                              color:white; margin-top:4px; font-size:15px;"
+                       oninput="formatCardNumber(this)">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div>
+                  <label style="color:#999; font-size:13px;">Expiry Date</label>
+                  <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"
+                         style="width:100%; padding:12px; background:#2a2a2a;
+                                border:1px solid #333; border-radius:8px;
+                                color:white; margin-top:4px;"
+                         oninput="formatExpiry(this)">
+                </div>
+                <div>
+                  <label style="color:#999; font-size:13px;">CVV</label>
+                  <input type="text" id="cardCVV" placeholder="123" maxlength="3"
+                         style="width:100%; padding:12px; background:#2a2a2a;
+                                border:1px solid #333; border-radius:8px;
+                                color:white; margin-top:4px;"
+                         oninput="this.value=this.value.replace(/\D/g,'')">
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <label style="color:#999; font-size:13px;">Cardholder Name</label>
+                <input type="text" id="cardName" placeholder="Name on card"
+                       style="width:100%; padding:12px; background:#2a2a2a;
+                              border:1px solid #333; border-radius:8px;
+                              color:white; margin-top:4px;">
+              </div>
+              <div style="margin-top:12px; padding:10px 14px; background:#1a2a1a;
+                          border-radius:8px; border:1px solid #2a4a2a;">
+                <span style="color:#4ade80; font-size:13px;">
+                  🔒 Secured by 256-bit SSL encryption
+                </span>
+              </div>
+            </div>
+
+            <script>
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+              radio.addEventListener('change', function() {
+                document.getElementById('card-details').style.display = 
+                  this.value === 'Credit Card' ? 'block' : 'none';
+              });
+            });
+            function formatCardNumber(input) {
+              let value = input.value.replace(/\D/g, '').substring(0, 16);
+              input.value = value.match(/.{1,4}/g)?.join(' ') || value;
+            }
+            function formatExpiry(input) {
+              let value = input.value.replace(/\D/g, '').substring(0, 4);
+              if (value.length >= 2) value = value.substring(0,2) + '/' + value.substring(2);
+              input.value = value;
+            }
+            </script>
+            <button type="submit" class="btn btn-primary btn-lg">Place Order</button>
+        </form>
+        <aside class="cart-summary">
+            <h3>Order Summary</h3>
+            <ul class="checkout-items">
+                @foreach (var item in Model)
+                {
+                    <li><span>@item.FoodItem.Name x @item.Quantity</span><span>Rs. @((item.FoodItem.Price * item.Quantity).ToString("N0"))</span></li>
+                }
+            </ul>
+            <div class="summary-row"><span>Subtotal</span><span>Rs. @subtotal.ToString("N0")</span></div>
+            <div class="summary-row"><span>Delivery</span><span>Rs. @delivery.ToString("N0")</span></div>
+            <div class="summary-row summary-total"><span>Total</span><span>Rs. @total.ToString("N0")</span></div>
+        </aside>
+    </div>
+</div>

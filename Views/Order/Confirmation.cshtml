@@ -1,0 +1,29 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+<div class="container section">
+    <div class="confirmation-card">
+        <div class="success-icon">&#10003;</div>
+        <h1>Order Placed!</h1>
+        <p class="confirmation-sub">Your order <strong>#@Model.Id</strong> has been received.</p>
+        <p class="eta">Estimated delivery: <strong>30-45 minutes</strong></p>
+
+        <div class="confirmation-items">
+            <h3>Items</h3>
+            <ul>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <li>@item.FoodItem.Name x @item.Quantity &mdash; Rs. @((item.UnitPrice * item.Quantity).ToString("N0"))</li>
+                }
+            </ul>
+            <p class="confirmation-total">Total: Rs. @Model.TotalAmount.ToString("N0")</p>
+            <p><strong>Address:</strong> @Model.DeliveryAddress</p>
+            <p><strong>Payment:</strong> @Model.PaymentMethod</p>
+        </div>
+
+        <a asp-controller="Order" asp-action="Track" asp-route-orderId="@Model.Id" class="btn btn-primary">Track Order</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>

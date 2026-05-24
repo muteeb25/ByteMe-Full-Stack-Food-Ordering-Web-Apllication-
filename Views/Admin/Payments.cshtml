@@ -1,0 +1,75 @@
+﻿@model PaymentSummaryViewModel
+@{
+    ViewData["Title"] = "Payments";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Payments</h1>
+        <p class="page-subtitle">Payment transactions and revenue breakdown</p>
+    </div>
+</div>
+
+<div class="stat-grid stat-grid-sm">
+    <div class="stat-card stat-orange">
+        <div class="stat-body">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value">Rs. @Model.TotalRevenue.ToString("N0")</span>
+        </div>
+    </div>
+    <div class="stat-card stat-blue">
+        <div class="stat-body">
+            <span class="stat-label">Cash Orders</span>
+            <span class="stat-value">@Model.CashOrders</span>
+        </div>
+    </div>
+    <div class="stat-card stat-purple">
+        <div class="stat-body">
+            <span class="stat-label">Card Orders</span>
+            <span class="stat-value">@Model.CardOrders</span>
+        </div>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-body">
+            <span class="stat-label">EasyPaisa</span>
+            <span class="stat-value">@Model.EasyPaisaOrders</span>
+        </div>
+    </div>
+    <div class="stat-card stat-purple">
+        <div class="stat-body">
+            <span class="stat-label">Newsletter Subscribers</span>
+            <span class="stat-value">@Model.NewsletterSubscribers</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="lumina-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model.Orders)
+                {
+                    <tr>
+                        <td>#@o.Id</td>
+                        <td>@o.User?.Name</td>
+                        <td>Rs. @o.TotalAmount.ToString("N0")</td>
+                        <td>@o.PaymentMethod</td>
+                        <td>@o.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                        <td><span class="badge badge-@o.Status.ToLower()">@o.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

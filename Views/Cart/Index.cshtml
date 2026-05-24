@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CartItem>
+@{
+    ViewData["Title"] = "Cart";
+    var subtotal = (decimal)ViewBag.Subtotal;
+    var delivery = (decimal)ViewBag.DeliveryFee;
+    var total = (decimal)ViewBag.Total;
+}
+
+<div class="container section cart-page">
+    <h1 class="section-title">Your Cart</h1>
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <p>Your cart is empty.</p>
+            <a asp-controller="Menu" asp-action="Index" class="btn btn-primary">Browse Menu</a>
+        </div>
+    }
+    else
+    {
+        <div class="cart-layout">
+            <div class="cart-items">
+                <table class="cart-table">
+                    <thead>
+                        <tr><th>Item</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var rowTotal = item.FoodItem.Price * item.Quantity;
+                            <tr id="cart-row-@item.Id" data-price="@item.FoodItem.Price">
+                                <td class="cart-item-cell">
+                                    <div class="cart-item-thumb" style="background-image: url('@item.FoodItem.ImageUrl');"></div>
+                                    <span>@item.FoodItem.Name</span>
+                                </td>
+                                <td>
+                                    <div class="qty-controls">
+                                        <button type="button" class="qty-btn" onclick="updateQuantity(@item.Id, @item.Quantity - 1, @item.FoodItem.Price)">-</button>
+                                        <span class="qty-value" id="qty-@item.Id">@item.Quantity</span>
+                                        <button type="button" class="qty-btn" onclick="updateQuantity(@item.Id, @item.Quantity + 1, @item.FoodItem.Price)">+</button>
+                                    </div>
+                                </td>
+                                <td>Rs. @item.FoodItem.Price.ToString("N0")</td>
+                                <td class="row-total" id="total-@item.Id">Rs. @rowTotal.ToString("N0")</td>
+                                <td><button type="button" class="btn btn-danger btn-sm" onclick="removeFromCart(@item.Id, document.getElementById('cart-row-@item.Id'))">Remove</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <aside class="cart-summary">
+                <h3>Order Summary</h3>
+                <div class="summary-row"><span>Subtotal</span><span id="subtotal">Rs. @subtotal.ToString("N0")</span></div>
+                <div class="summary-row"><span>Delivery</span><span>Rs. @delivery.ToString("N0")</span></div>
+                <div class="summary-row summary-total"><span>Total</span><span id="cart-grand-total">Rs. @total.ToString("N0")</span></div>
+                <a asp-controller="Order" asp-action="Checkout" class="btn btn-primary btn-block">Checkout</a>
+            </aside>
+        </div>
+    }
+</div>

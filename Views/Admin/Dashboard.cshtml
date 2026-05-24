@@ -1,0 +1,123 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header">
+    <div>
+        <h1>ByteMe Insights</h1>
+        <p class="page-subtitle">Real-time overview of your food ordering activity</p>
+    </div>
+    <a asp-action="FoodItems" class="btn btn-primary">+ New Item</a>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card stat-blue">
+        <div class="stat-icon">&#127829;</div>
+        <div class="stat-body">
+            <span class="stat-label">Total Food Items</span>
+            <span class="stat-value">@Model.TotalFoodItems</span>
+        </div>
+        <span class="stat-ghost">&#127829;</span>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-icon">&#128230;</div>
+        <div class="stat-body">
+            <span class="stat-label">Active Orders</span>
+            <span class="stat-value">@Model.ActiveOrders</span>
+        </div>
+        <span class="stat-ghost">&#128230;</span>
+    </div>
+    <div class="stat-card stat-purple">
+        <div class="stat-icon">&#128101;</div>
+        <div class="stat-body">
+            <span class="stat-label">Registered Users</span>
+            <span class="stat-value">@Model.RegisteredUsers</span>
+        </div>
+        <span class="stat-ghost">&#128101;</span>
+    </div>
+    <div class="stat-card stat-orange">
+        <div class="stat-icon">&#128176;</div>
+        <div class="stat-body">
+            <span class="stat-label">Total Revenue</span>
+            <span class="stat-value">Rs. @Model.TotalRevenue.ToString("N0")</span>
+        </div>
+        <span class="stat-ghost">&#128176;</span>
+    </div>
+    <div class="stat-card stat-blue">
+        <div class="stat-icon">&#11088;</div>
+        <div class="stat-body">
+            <span class="stat-label">Total Feedback</span>
+            <span class="stat-value">@Model.TotalFeedback</span>
+        </div>
+        <span class="stat-ghost">&#11088;</span>
+    </div>
+    <div class="stat-card stat-green">
+        <div class="stat-icon">&#9993;</div>
+        <div class="stat-body">
+            <span class="stat-label">Newsletter Subscribers</span>
+            <span class="stat-value">@Model.NewsletterSubscribers</span>
+        </div>
+        <span class="stat-ghost">&#9993;</span>
+    </div>
+</div>
+
+<div class="dashboard-columns">
+    <div class="card panel-orders">
+        <div class="card-header">
+            <h2>Recent Orders</h2>
+            <a asp-action="Orders" class="link-view-all">View All</a>
+        </div>
+        <div class="table-wrap">
+            <table class="lumina-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.RecentOrders)
+                    {
+                        <tr>
+                            <td><strong>#@order.Id</strong></td>
+                            <td>@order.User?.Name</td>
+                            <td>@order.OrderItems.Count</td>
+                            <td>Rs. @order.TotalAmount.ToString("N0")</td>
+                            <td><span class="badge badge-@order.Status.ToLower()">@order.Status</span></td>
+                            <td>@order.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card panel-top-items">
+        <div class="card-header">
+            <h2>Top Food Items</h2>
+        </div>
+        <ul class="top-items-list">
+            @foreach (var item in Model.TopFoodItems)
+            {
+                <li class="top-item-row">
+                    <img src="@item.ImageUrl" alt="@item.Name" class="top-item-thumb" />
+                    <div class="top-item-info">
+                        <span class="top-item-name">@item.Name</span>
+                        <span class="top-item-meta">@item.OrderCount orders</span>
+                    </div>
+                    <span class="top-item-price">Rs. @item.Price.ToString("N0")</span>
+                </li>
+            }
+            @if (!Model.TopFoodItems.Any())
+            {
+                <li class="empty-row">No order data yet</li>
+            }
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,103 @@
+﻿@{
+    var cartCount = ViewBag.CartCount ?? 0;
+    var isLoggedIn = Context.Session.GetInt32("UserId") != null;
+    var userName = Context.Session.GetString("UserName");
+    var userRole = Context.Session.GetString("UserRole");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ByteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+</head>
+<body>
+    @if (ViewData["ShowMarquee"] != null)
+    {
+    <div class="promo-marquee" aria-hidden="true">
+        <div class="marquee-track">
+            <span>&#128293; FREE DELIVERY on orders above Rs.1000</span>
+            <span>&#127881; Student Deal only Rs.650</span>
+            <span>&#9889; Order now and get 10% off your first order</span>
+            <span>&#128293; FREE DELIVERY on orders above Rs.1000</span>
+            <span>&#127881; Student Deal only Rs.650</span>
+            <span>&#9889; Order now and get 10% off your first order</span>
+        </div>
+    </div>
+    }
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a class="nav-logo" asp-controller="Home" asp-action="Index">ByteMe <span class="logo-emoji">&#127828;</span></a>
+            <ul class="nav-links">
+                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li><a asp-controller="Menu" asp-action="Index">Menu</a></li>
+                <li>
+                    <a asp-controller="Cart" asp-action="Index" class="cart-link">
+                        Cart <span class="nav-cart-icon">&#128722;</span>
+                        <span class="cart-badge" id="cart-badge">@cartCount</span>
+                    </a>
+                </li>
+                <li><a asp-controller="Contact" asp-action="Index">Contact</a></li>
+                @if (isLoggedIn)
+                {
+                    <li><a asp-controller="Order" asp-action="Track">Track</a></li>
+                    <li><a asp-controller="Order" asp-action="History">Orders</a></li>
+                    <li><a asp-controller="Feedback" asp-action="Index">Feedback</a></li>
+                    <li><a asp-controller="Account" asp-action="Profile">Profile</a></li>
+                    @if (userRole == "Admin")
+                    {
+                        <li><a asp-controller="Admin" asp-action="Dashboard">Admin</a></li>
+                    }
+                    <li><span class="nav-user">Hi, @userName</span></li>
+                    <li><a asp-controller="Account" asp-action="Logout">Logout</a></li>
+                }
+                else
+                {
+                    <li><a asp-controller="Account" asp-action="Login">Login</a></li>
+                    <li><a asp-controller="Account" asp-action="Register" class="btn-nav">Register</a></li>
+                }
+            </ul>
+        </div>
+    </nav>
+
+    <main class="@(ViewData["HideFooter"] != null ? "page-home" : "")">
+        @RenderBody()
+    </main>
+
+    @if (ViewData["HideFooter"] == null)
+    {
+    <footer class="site-footer">
+        <div class="footer-inner container">
+            <p class="footer-brand">ByteMe <span class="logo-emoji">&#127828;</span></p>
+            <p>Fast food, faster delivery. Order your favorites today.</p>
+            <form class="newsletter-form" asp-controller="Home" asp-action="SubscribeNewsletter" method="post">
+                @Html.AntiForgeryToken()
+                <label for="footer-newsletter-email">Get deals in your inbox</label>
+                <div class="newsletter-row">
+                    <input type="email" id="footer-newsletter-email" name="email" placeholder="your@email.com" required />
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </div>
+            </form>
+            <p class="footer-copy">&copy; @DateTime.Now.Year ByteMe. All rights reserved.</p>
+        </div>
+    </footer>
+    }
+
+    <a asp-controller="Cart" asp-action="Index" class="floating-cart" id="floating-cart" title="View cart">
+        <span class="floating-cart-icon">&#128722;</span>
+        <span class="floating-cart-badge" id="float-cart-badge">@cartCount</span>
+    </a>
+
+    <div id="toast-container"></div>
+
+    @Html.AntiForgeryToken()
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+    <script src="~/js/menu.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

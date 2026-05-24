@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<div class="container section">
+    <h1 class="section-title">Your Orders</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <p>No orders yet.</p>
+            <a asp-controller="Menu" asp-action="Index" class="btn btn-primary">Order Now</a>
+        </div>
+    }
+    else
+    {
+        <div class="orders-list">
+            @foreach (var order in Model)
+            {
+                <article class="order-card">
+                    <div class="order-card-header">
+                        <span class="order-id">Order #@order.Id</span>
+                        <span class="status-badge status-@order.Status.ToLower()">@order.Status</span>
+                    </div>
+                    <p class="order-meta">@order.CreatedAt.ToString("MMM dd, yyyy HH:mm")</p>
+                    <p class="order-total">Rs. @order.TotalAmount.ToString("N0")</p>
+                    <p class="order-items-count">@order.OrderItems.Count item(s)</p>
+                </article>
+            }
+        </div>
+    }
+</div>

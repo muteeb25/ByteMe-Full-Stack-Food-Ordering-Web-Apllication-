@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Feedback>
+@{
+    ViewData["Title"] = "Feedbacks";
+    Layout = "_AdminLayout";
+    var filter = ViewBag.Filter as string ?? "All";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Customer Feedback</h1>
+        <p class="page-subtitle">Review and approve customer reviews</p>
+    </div>
+</div>
+
+<div class="filter-tabs">
+    <a asp-action="Feedbacks" asp-route-filter="All" class="filter-tab @(filter == "All" ? "active" : "")">All</a>
+    <a asp-action="Feedbacks" asp-route-filter="Approved" class="filter-tab @(filter == "Approved" ? "active" : "")">Approved</a>
+    <a asp-action="Feedbacks" asp-route-filter="Pending" class="filter-tab @(filter == "Pending" ? "active" : "")">Pending</a>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="lumina-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Food Item</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var fb in Model)
+                {
+                    <tr>
+                        <td>@fb.User?.Name</td>
+                        <td>@fb.FoodItemName</td>
+                        <td>
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span style="color:@(i <= fb.Rating ? "#f59e0b" : "#cbd5e1")">&#9733;</span>
+                            }
+                        </td>
+                        <td>@(fb.Comment.Length > 50 ? fb.Comment[..50] + "..." : fb.Comment)</td>
+                        <td>@fb.SubmittedAt.ToString("MMM dd, yyyy")</td>
+                        <td>@(fb.IsApproved ? "Approved" : "Pending")</td>
+                        <td class="actions-cell">
+                            @if (!fb.IsApproved)
+                            {
+                                <button type="button" class="btn btn-sm btn-primary btn-approve-fb" data-id="@fb.Id">Approve</button>
+                            }
+                            <button type="button" class="btn btn-sm btn-danger btn-delete-fb" data-id="@fb.Id">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.btn-approve-fb').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const fd = new FormData();
+        fd.append('id', btn.dataset.id);
+        const res = await fetch('/Admin/ApproveFeedback', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) location.reload();
+    });
+});
+document.querySelectorAll('.btn-delete-fb').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        if (!confirm('Delete this feedback?')) return;
+        const fd = new FormData();
+        fd.append('id', btn.dataset.id);
+        const res = await fetch('/Admin/DeleteFeedback', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) btn.closest('tr').remove();
+    });
+});
+</script>
+}

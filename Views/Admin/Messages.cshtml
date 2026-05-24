@@ -1,0 +1,43 @@
+﻿@model IEnumerable<ContactMessage>
+@{
+    ViewData["Title"] = "Messages";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Messages</h1>
+        <p class="page-subtitle">Customer contact form submissions</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="lumina-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model)
+                {
+                    var preview = m.Message.Length > 60 ? m.Message[..60] + "..." : m.Message;
+                    <tr>
+                        <td><strong>@m.Name</strong></td>
+                        <td>@m.Email</td>
+                        <td>@preview</td>
+                        <td>@m.SubmittedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                        <td>
+                            <a href="mailto:@m.Email?subject=Re: ByteMe Contact" class="btn btn-sm btn-secondary">Reply</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

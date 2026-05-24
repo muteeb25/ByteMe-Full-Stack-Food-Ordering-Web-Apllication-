@@ -1,0 +1,42 @@
+﻿@model IEnumerable<CustomerListViewModel>
+@{
+    ViewData["Title"] = "Customers";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Customers</h1>
+        <p class="page-subtitle">Registered customer accounts and activity</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-wrap">
+        <table class="lumina-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Registered</th>
+                    <th>Total Orders</th>
+                    <th>Total Spent</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>#@c.Id</td>
+                        <td><strong>@c.Name</strong></td>
+                        <td>@c.Email</td>
+                        <td>@c.RegisteredDate.ToString("MMM dd, yyyy")</td>
+                        <td>@c.TotalOrders</td>
+                        <td>Rs. @c.TotalSpent.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

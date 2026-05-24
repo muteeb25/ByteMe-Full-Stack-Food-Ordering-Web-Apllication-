@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Category>
+@{
+    ViewData["Title"] = "Home";
+    ViewData["HideFooter"] = true;
+    ViewData["ShowMarquee"] = true;
+    var featured = ViewBag.FeaturedItems as IEnumerable<FoodItem> ?? Enumerable.Empty<FoodItem>();
+}
+
+<section class="hero hero-full">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <span class="hero-line hero-fade">Hungry?</span>
+            <span class="hero-line hero-slide">ByteMe<span class="hero-dot">.</span> <span class="logo-emoji">&#127828;</span></span>
+        </h1>
+        <p class="hero-sub hero-fade-delay">Fresh fast food delivered to your door.</p>
+        <form class="hero-search hero-fade-delay" asp-controller="Menu" asp-action="Index" method="get">
+            <input type="search" name="search" placeholder="Search pizza, burgers, pasta..." aria-label="Search menu" />
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <a asp-controller="Menu" asp-action="Index" class="btn btn-primary btn-lg hero-cta hero-fade-delay">Order Now</a>
+    </div>
+</section>
+
+@if (featured.Any())
+{
+    <section class="section specials-section">
+        <div class="container">
+            <h2 class="section-title">Today&apos;s Specials</h2>
+            <div class="grid specials-grid">
+                @foreach (var item in featured)
+                {
+                    <article class="special-card">
+                        <div class="special-image" style="background-image: url('@item.ImageUrl');"></div>
+                        <div class="special-body">
+                            <h3>@item.Name</h3>
+                            <p class="price">Rs. @item.Price.ToString("N0")</p>
+                            <a asp-controller="Menu" asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">Order Now</a>
+                        </div>
+                    </article>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<section class="section categories-section">
+    <div class="container">
+        <h2 class="section-title">Browse Categories</h2>
+        <div class="grid categories-grid">
+            @foreach (var category in Model)
+            {
+                <a asp-controller="Menu" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card-overlay">
+                    <div class="category-bg" style="background-image: url('@category.ImageUrl');"></div>
+                    <div class="category-overlay"></div>
+                    <h3 class="category-name">@category.Name</h3>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section why-section">
+    <div class="container">
+        <h2 class="section-title">Why ByteMe?</h2>
+        <div class="features-grid">
+            <article class="feature-card">
+                <span class="feature-icon">&#128640;</span>
+                <h3>Fast Delivery</h3>
+                <p>Hot meals at your door in 30-45 minutes.</p>
+            </article>
+            <article class="feature-card">
+                <span class="feature-icon">&#127829;</span>
+                <h3>Fresh Food</h3>
+                <p>Quality ingredients prepared fresh when you order.</p>
+            </article>
+            <article class="feature-card">
+                <span class="feature-icon">&#128179;</span>
+                <h3>Easy Payment</h3>
+                <p>Cash, card, or EasyPaisa &mdash; pay your way.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer home-footer">
+    <div class="footer-inner container">
+        <p class="footer-brand">ByteMe <span class="logo-emoji">&#127828;</span></p>
+        <p class="footer-tagline">Fast food, faster delivery.</p>
+        <form class="newsletter-form" asp-controller="Home" asp-action="SubscribeNewsletter" method="post">
+            @Html.AntiForgeryToken()
+            <label for="newsletter-email">Get deals in your inbox</label>
+            <div class="newsletter-row">
+                <input type="email" id="newsletter-email" name="email" placeholder="your@email.com" required />
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </div>
+        </form>
+        @if (TempData["NewsletterSuccess"] != null) { <p class="newsletter-msg success">@TempData["NewsletterSuccess"]</p> }
+        @if (TempData["NewsletterError"] != null) { <p class="newsletter-msg error">@TempData["NewsletterError"]</p> }
+        <div class="footer-links">
+            <a asp-controller="Menu" asp-action="Index">Menu</a>
+            <a asp-controller="Feedback" asp-action="Index">Feedback</a>
+            <a asp-controller="Contact" asp-action="Index">Contact</a>
+        </div>
+        <p class="footer-copy">&copy; @DateTime.Now.Year ByteMe. All rights reserved.</p>
+    </div>
+</footer>

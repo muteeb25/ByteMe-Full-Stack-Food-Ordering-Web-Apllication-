@@ -1,0 +1,84 @@
+﻿@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "Admin";
+    var activeNav = ViewData["ActiveNav"]?.ToString() ?? "";
+    var adminName = ViewBag.AdminName as string ?? "Admin";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - ByteMe Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="lumina-admin">
+    <aside class="lumina-sidebar" id="lumina-sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-logo">ByteMe &#127828;</span>
+            <span class="sidebar-version">Admin Panel v1.0</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a asp-action="Dashboard" class="nav-item @(activeNav == "Dashboard" ? "active" : "")">
+                <span class="nav-icon">&#128202;</span> Dashboard
+            </a>
+            <a asp-action="FoodItems" class="nav-item @(activeNav == "FoodItems" ? "active" : "")">
+                <span class="nav-icon">&#127829;</span> Food Items
+            </a>
+            <a asp-action="Orders" class="nav-item @(activeNav == "Orders" ? "active" : "")">
+                <span class="nav-icon">&#128230;</span> Orders
+            </a>
+            <a asp-action="Customers" class="nav-item @(activeNav == "Customers" ? "active" : "")">
+                <span class="nav-icon">&#128101;</span> Customers
+            </a>
+            <a asp-action="Payments" class="nav-item @(activeNav == "Payments" ? "active" : "")">
+                <span class="nav-icon">&#128179;</span> Payments
+            </a>
+            <a asp-action="Deliveries" class="nav-item @(activeNav == "Deliveries" ? "active" : "")">
+                <span class="nav-icon">&#128666;</span> Deliveries
+            </a>
+            <a asp-action="Messages" class="nav-item @(activeNav == "Messages" ? "active" : "")">
+                <span class="nav-icon">&#128172;</span> Messages
+            </a>
+            <a asp-action="Feedbacks" class="nav-item @(activeNav == "Feedbacks" ? "active" : "")">
+                <span class="nav-icon">&#11088;</span> Feedbacks
+            </a>
+            <a asp-controller="Account" asp-action="Logout" class="nav-item nav-logout">
+                <span class="nav-icon">&#128682;</span> Logout
+            </a>
+        </nav>
+        <div class="sidebar-db">
+            <span class="db-label">CONNECTED DATABASE</span>
+            <span class="db-status">&#128994; SQL Server Engine</span>
+        </div>
+    </aside>
+
+    <div class="lumina-main">
+        <header class="lumina-header">
+            <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle menu">&#9776;</button>
+            <div class="header-search">
+                <span class="search-icon">&#128269;</span>
+                <input type="search" placeholder="Search in dashboard..." id="dashboard-search" />
+            </div>
+            <div class="header-user">
+                <div class="user-info">
+                    <span class="user-name">@adminName</span>
+                    <span class="user-role">ADMINISTRATOR</span>
+                </div>
+                <div class="user-avatar">@(adminName.Length > 0 ? adminName[0].ToString().ToUpper() : "A")</div>
+            </div>
+        </header>
+
+        <main class="lumina-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    @Html.AntiForgeryToken()
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

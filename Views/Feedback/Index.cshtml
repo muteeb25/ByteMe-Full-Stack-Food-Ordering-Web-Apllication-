@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Feedback>
+@{
+    ViewData["Title"] = "Feedback";
+    var foodItems = ViewBag.FoodItems as List<string> ?? new List<string>();
+}
+
+<div class="container section feedback-page">
+    <h1 class="section-title">Share Your Experience</h1>
+    <p class="section-sub">Tell us about your favorite ByteMe dish</p>
+
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-error">@TempData["Error"]</div> }
+
+    <div class="feedback-layout">
+        <form asp-action="Submit" method="post" class="feedback-form auth-card">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label for="foodItemName">Food Item</label>
+                <input list="food-list" id="foodItemName" name="foodItemName" required placeholder="Type or select a dish" />
+                <datalist id="food-list">
+                    @foreach (var name in foodItems) { <option value="@name" /> }
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="star-rating">
+                  <input type="radio" id="star5" name="Rating" value="5">
+                  <label for="star5">★</label>
+                  <input type="radio" id="star4" name="Rating" value="4">
+                  <label for="star4">★</label>
+                  <input type="radio" id="star3" name="Rating" value="3">
+                  <label for="star3">★</label>
+                  <input type="radio" id="star2" name="Rating" value="2">
+                  <label for="star2">★</label>
+                  <input type="radio" id="star1" name="Rating" value="1" checked>
+                  <label for="star1">★</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="comment">Comment</label>
+                <textarea id="comment" name="comment" rows="4" placeholder="What did you love?"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit Feedback</button>
+        </form>
+
+        <div class="my-feedbacks">
+            <h2>Your Past Feedback</h2>
+            @if (!Model.Any())
+            {
+                <p class="text-muted">No feedback submitted yet.</p>
+            }
+            else
+            {
+                @foreach (var fb in Model)
+                {
+                    <article class="my-feedback-item">
+                        <div class="review-stars">
+                            @for (int i = 1; i <= 5; i++) { <span class="star @(i <= fb.Rating ? "filled" : "")">&#9733;</span> }
+                        </div>
+                        <strong>@fb.FoodItemName</strong>
+                        <p>@fb.Comment</p>
+                        <small>@fb.SubmittedAt.ToString("MMM dd, yyyy") &mdash; @(fb.IsApproved ? "Approved" : "Pending review")</small>
+                    </article>
+                }
+            }
+        </div>
+    </div>
+</div>

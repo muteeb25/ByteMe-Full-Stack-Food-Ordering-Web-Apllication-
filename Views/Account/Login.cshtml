@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+    var selectedRole = ViewBag.SelectedRole as string ?? "Customer";
+    var isAdmin = selectedRole == "Admin";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - ByteMe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+</head>
+<body class="login-page @(isAdmin ? "theme-admin" : "theme-customer")" id="login-page">
+    <div class="login-split">
+        <aside class="login-brand">
+            <div class="login-brand-inner">
+                <h1 class="brand-title">ByteMe <span>&#127828;</span></h1>
+                <p class="brand-tagline">Fast food, faster delivery.</p>
+                <p class="brand-desc">Order pizza, burgers, sandwiches &amp; pasta from your favorite local kitchen.</p>
+                <div class="brand-stats">
+                    <div><strong>12+</strong><span>Menu Items</span></div>
+                    <div><strong>30min</strong><span>Avg Delivery</span></div>
+                    <div><strong>4.9</strong><span>Rating</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="login-form-side">
+            <div class="login-form-wrap">
+                <h2>Welcome back</h2>
+                <p class="login-sub">Choose your role and sign in</p>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-error">@ViewBag.Error</div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                <div class="role-tabs" id="role-tabs">
+                    <button type="button" class="role-tab @(isAdmin ? "" : "active")" data-role="Customer">
+                        <span class="role-icon">&#128100;</span> Customer Login
+                    </button>
+                    <button type="button" class="role-tab @(isAdmin ? "active" : "")" data-role="Admin">
+                        <span class="role-icon">&#128295;</span> Admin Login
+                    </button>
+                </div>
+
+                <form asp-action="Login" method="post" class="login-form" id="login-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="role" id="role-input" value="@selectedRole" />
+
+                    <div class="form-fields" id="form-fields">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="you@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required placeholder="Your password" />
+                        </div>
+                        <button type="submit" class="btn-login" id="btn-login">Sign In</button>
+                    </div>
+                </form>
+
+                <p class="login-hint" id="login-hint">
+                    @if (isAdmin)
+                    {
+                        <text>Demo admin: admin@byteme.com / Admin@123</text>
+                    }
+                    else
+                    {
+                        <text>Demo customer: user@byteme.com / User@123</text>
+                    }
+                </p>
+                <p class="login-register">New here? <a asp-action="Register">Create account</a></p>
+            </div>
+        </section>
+    </div>
+
+    <script src="~/js/login.js" asp-append-version="true"></script>
+</body>
+</html>

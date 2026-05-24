@@ -1,0 +1,89 @@
+﻿@model IEnumerable<FoodItem>
+@{
+    ViewData["Title"] = "Menu";
+    var categories = ViewBag.Categories as IEnumerable<Category> ?? Enumerable.Empty<Category>();
+    var selectedId = ViewBag.SelectedCategoryId as int?;
+    var search = ViewBag.Search as string;
+    var approvedFeedbacks = ViewBag.ApprovedFeedbacks as IEnumerable<Feedback> ?? Enumerable.Empty<Feedback>();
+}
+
+<div class="menu-page">
+    <div class="menu-header">
+        <div class="container">
+            <h1 class="section-title">Our Menu</h1>
+            <div class="menu-search-wrap">
+                <input type="search" id="menu-live-search" class="menu-search-input" placeholder="Search dishes..." value="@search" />
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="category-tabs" id="category-tabs">
+            <button type="button" class="tab-btn @(selectedId == null ? "active" : "")" data-category-id="">All</button>
+            @foreach (var cat in categories)
+            {
+                <button type="button" class="tab-btn @(selectedId == cat.Id ? "active" : "")" data-category-id="@cat.Id">@cat.Name</button>
+            }
+        </div>
+
+        <div class="grid food-grid" id="food-grid">
+            @foreach (var item in Model)
+            {
+                <article class="food-card food-card-premium food-searchable"
+                         data-name="@item.Name.ToLower()"
+                         data-desc="@item.Description.ToLower()"
+                         data-category="@item.Category?.Name?.ToLower()">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="food-card-link">
+                        <div class="food-card-image-wrap">
+                            <img class="food-card-img" src="@item.ImageUrl" alt="@item.Name" loading="lazy" />
+                            <span class="food-badge">@item.Category?.Name</span>
+                        </div>
+                        <div class="food-card-body">
+                            <h3>@item.Name</h3>
+                            <p class="food-desc">@item.Description</p>
+                            <div class="food-card-footer">
+                                <span class="price">Rs. @item.Price.ToString("N0")</span>
+                            </div>
+                        </div>
+                    </a>
+                    <button type="button" class="btn btn-primary btn-add btn-add-overlay" onclick="event.preventDefault(); addToCart(@item.Id)">
+                        <span class="btn-plus">+</span> Add to Cart
+                    </button>
+                </article>
+            }
+        </div>
+
+        <div class="empty-state" id="menu-no-results" style="display:none;">
+            <p>No items match your search.</p>
+        </div>
+    </div>
+
+    @if (approvedFeedbacks.Any())
+    {
+        <section class="section reviews-section">
+            <div class="container">
+                <h2 class="section-title">What Our Customers Say</h2>
+                <div class="reviews-grid">
+                    @foreach (var fb in approvedFeedbacks)
+                    {
+                        <article class="review-card">
+                            <div class="review-avatar">@(fb.User?.Name?.Length > 0 ? fb.User.Name[0].ToString().ToUpper() : "?")</div>
+                            <div class="review-body">
+                                <strong>@fb.User?.Name</strong>
+                                <div class="review-stars" aria-label="@fb.Rating stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="star @(i <= fb.Rating ? "filled" : "")">&#9733;</span>
+                                    }
+                                </div>
+                                <p class="review-food">@fb.FoodItemName</p>
+                                <p class="review-comment">@fb.Comment</p>
+                                <time class="review-date">@fb.SubmittedAt.ToString("MMM dd, yyyy")</time>
+                            </div>
+                        </article>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+</div>

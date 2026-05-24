@@ -1,0 +1,115 @@
+﻿@model IEnumerable<FoodItem>
+@{
+    ViewData["Title"] = "Food Items";
+    Layout = "_AdminLayout";
+    var categories = ViewBag.Categories as IEnumerable<Category> ?? Enumerable.Empty<Category>();
+}
+
+<div class="page-header">
+    <div>
+        <h1>Food Items</h1>
+        <p class="page-subtitle">Manage your menu catalog</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn-add-item">+ Add New Item</button>
+</div>
+
+@if (TempData["Success"] != null) { <div class="alert-banner success">@TempData["Success"]</div> }
+@if (TempData["Error"] != null) { <div class="alert-banner error">@TempData["Error"]</div> }
+
+<div class="card">
+    <div class="toolbar">
+        <input type="search" id="food-search" class="search-input" placeholder="Search food items..." />
+    </div>
+    <div class="table-wrap">
+        <table class="lumina-table" id="food-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Available</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-name="@item.Name.ToLower()" data-category="@item.Category?.Name?.ToLower()">
+                        <td><img src="@item.ImageUrl" alt="" class="table-thumb" /></td>
+                        <td><strong>@item.Name</strong></td>
+                        <td>@item.Category?.Name</td>
+                        <td>Rs. @item.Price.ToString("N0")</td>
+                        <td>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="avail-toggle" data-id="@item.Id" @(item.IsAvailable ? "checked" : "") />
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </td>
+                        <td class="actions-cell">
+                            <button type="button" class="btn btn-sm btn-secondary btn-edit" data-id="@item.Id">Edit</button>
+                            <form asp-action="DeleteFoodItem" method="post" class="inline-form" onsubmit="return confirm('Delete?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="add-modal">
+    <div class="modal-panel">
+        <div class="modal-header">
+            <h3>Add New Item</h3>
+            <button type="button" class="modal-close" data-close>&times;</button>
+        </div>
+        <form asp-action="AddFoodItem" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group"><label>Name</label><input type="text" name="Name" required /></div>
+            <div class="form-group"><label>Category</label>
+                <select name="CategoryId" required>
+                    @foreach (var cat in categories) { <option value="@cat.Id">@cat.Name</option> }
+                </select>
+            </div>
+            <div class="form-group"><label>Price (Rs.)</label><input type="number" name="Price" step="0.01" min="1" required /></div>
+            <div class="form-group"><label>Description</label><textarea name="Description" rows="2"></textarea></div>
+            <div class="form-group"><label>Image URL</label><input type="text" name="ImageUrl" placeholder="https://..." /></div>
+            <div class="form-group"><label><input type="checkbox" name="IsAvailable" value="true" checked /> Available</label></div>
+            <button type="submit" class="btn btn-primary btn-block">Add Item</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Side Panel -->
+<div class="side-panel-overlay" id="edit-overlay"></div>
+<aside class="side-panel" id="edit-panel">
+    <div class="side-panel-header">
+        <h3>Edit Food Item</h3>
+        <button type="button" class="modal-close" id="close-edit">&times;</button>
+    </div>
+    <form id="edit-form">
+        <input type="hidden" id="edit-id" name="Id" />
+        <div class="form-group"><label>Name</label><input type="text" id="edit-name" name="Name" required /></div>
+        <div class="form-group"><label>Category</label>
+            <select id="edit-category" name="CategoryId" required>
+                @foreach (var cat in categories) { <option value="@cat.Id">@cat.Name</option> }
+            </select>
+        </div>
+        <div class="form-group"><label>Price</label><input type="number" id="edit-price" name="Price" step="0.01" required /></div>
+        <div class="form-group"><label>Description</label><textarea id="edit-desc" name="Description" rows="2"></textarea></div>
+        <div class="form-group"><label>Image URL</label><input type="text" id="edit-image" name="ImageUrl" /></div>
+        <div class="form-group"><label><input type="checkbox" id="edit-available" name="IsAvailable" /> Available</label></div>
+        <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+    </form>
+</aside>
+
+@section Scripts {
+<script>
+    window.foodCategories = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(categories.Select(c => new { c.Id, c.Name })));
+</script>
+}

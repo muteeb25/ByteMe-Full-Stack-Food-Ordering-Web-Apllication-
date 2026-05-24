@@ -1,0 +1,88 @@
+﻿@model FoodItem
+@{
+    ViewData["Title"] = Model.Name;
+    var reviews = ViewBag.Reviews as IEnumerable<Feedback> ?? Enumerable.Empty<Feedback>();
+    var related = ViewBag.RelatedItems as IEnumerable<FoodItem> ?? Enumerable.Empty<FoodItem>();
+}
+
+<div class="container section menu-detail-page">
+    <div class="detail-page-grid">
+        <div class="detail-page-image">
+            <img src="@Model.ImageUrl" alt="@Model.Name" />
+        </div>
+        <div class="detail-page-info">
+            <span class="food-category">@Model.Category?.Name</span>
+            <h1>@Model.Name</h1>
+            <p class="detail-description">@Model.Description</p>
+            <p class="price price-lg">Rs. @Model.Price.ToString("N0")</p>
+            <div class="qty-row">
+                <label for="detail-qty">Quantity</label>
+                <div class="qty-controls">
+                    <button type="button" class="qty-btn" id="qty-minus">−</button>
+                    <span class="qty-value" id="detail-qty-display">1</span>
+                    <button type="button" class="qty-btn" id="qty-plus">+</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-lg" id="detail-add-cart" data-id="@Model.Id">Add to Cart</button>
+            <a asp-action="Index" class="btn btn-secondary">Back to Menu</a>
+        </div>
+    </div>
+
+    @if (reviews.Any())
+    {
+        <section class="detail-reviews">
+            <h2>Customer Reviews</h2>
+            <div class="reviews-grid">
+                @foreach (var fb in reviews)
+                {
+                    <article class="review-card">
+                        <div class="review-avatar">@(fb.User?.Name?.Length > 0 ? fb.User.Name[0].ToString().ToUpper() : "?")</div>
+                        <div class="review-body">
+                            <strong>@fb.User?.Name</strong>
+                            <div class="review-stars">
+                                @for (int i = 1; i <= 5; i++) { <span class="star @(i <= fb.Rating ? "filled" : "")">&#9733;</span> }
+                            </div>
+                            <p class="review-comment">@fb.Comment</p>
+                            <time class="review-date">@fb.SubmittedAt.ToString("MMM dd, yyyy")</time>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+
+    @if (related.Any())
+    {
+        <section class="detail-related">
+            <h2>Related Items</h2>
+            <div class="grid food-grid">
+                @foreach (var item in related)
+                {
+                    <article class="food-card food-card-premium">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="food-card-link">
+                            <div class="food-card-image-wrap">
+                                <img class="food-card-img" src="@item.ImageUrl" alt="@item.Name" />
+                            </div>
+                            <div class="food-card-body">
+                                <h3>@item.Name</h3>
+                                <span class="price">Rs. @item.Price.ToString("N0")</span>
+                            </div>
+                        </a>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@section Scripts {
+<script>
+    let qty = 1;
+    const display = document.getElementById('detail-qty-display');
+    document.getElementById('qty-minus')?.addEventListener('click', () => { if (qty > 1) { qty--; display.textContent = qty; } });
+    document.getElementById('qty-plus')?.addEventListener('click', () => { qty++; display.textContent = qty; });
+    document.getElementById('detail-add-cart')?.addEventListener('click', () => {
+        addToCart(@Model.Id, qty);
+    });
+</script>
+}
