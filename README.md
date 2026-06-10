@@ -30,11 +30,3 @@ https://bytemefoodapp.netlify.app/
 - Git
 
 
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
-
----
-
-**Happy Ordering! 🍔🍕**
