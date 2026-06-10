@@ -1,6 +1,8 @@
 # ByteMe - Full Stack Food Ordering Web Application
 
 A modern ASP.NET Core MVC food ordering platform with user authentication, cart management, order tracking, and admin dashboard.
+Live Preview:
+https://bytemefoodapp.netlify.app/
 
 ## Tech Stack
 
